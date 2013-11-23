@@ -13,3 +13,11 @@ Build Requirements
 ------------------
 
 * ncurses headers and libs (package libncurses5-dev in debian, ??? in RH)
+
+TODO
+----
+
+* tall numbers and letters (steal characters from tmux or elsewhere)
+* multiple timezones
+* color
+* BUG: handle window resizing
