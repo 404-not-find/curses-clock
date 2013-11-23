@@ -24,11 +24,19 @@ int kbhit () {
 
 void display_clock() {
 	int centerx,centery;
+	char* time_string;
+	time_t now;
+	size_t width;
 	while (1) {
 		clear();
 		centerx = rows/2;
 		centery = columns/2;
-		mvprintw(centerx,centery-2,"%i,%i",centerx,centery);
+
+		now=time(NULL);
+		time_string=ctime(&now);
+		width = strlen(time_string);
+
+		mvprintw(centerx,centery-(width/2),"%s",time_string);
 		refresh();	// Print it on to the real screen
 
 		if (kbhit()) {
