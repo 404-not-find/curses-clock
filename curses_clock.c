@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <ncurses.h>
 
+int rows,columns; // window size
+
 void initializations() {
 	cbreak(); // cbreak so they don't have to hit enter to exit
+	getmaxyx(stdscr, rows, columns); // get current window size
 }
 
 int main() {
@@ -12,7 +15,8 @@ int main() {
 	refresh();				/* Print it on to the real screen */
 
 	initializations();
-	printw("initializations complete");
+	printw("\ninitializations complete\n");
+	printw("(rows=%i columns=%i)\n", rows, columns);
 	refresh();				/* Print it on to the real screen */
 	sleep(1);
 
