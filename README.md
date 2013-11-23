@@ -8,3 +8,8 @@ Inspirations
 
 * tablespoon's clock written with tput in shell script
 * George Carlin
+
+Build Requirements
+------------------
+
+* ncurses headers and libs (package libncurses5-dev in debian, ??? in RH)
