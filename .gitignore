@@ -15,3 +15,8 @@
 *.exe
 *.out
 *.app
+cclock
+
+# editor temporary files
+*.swp
+*.swq
