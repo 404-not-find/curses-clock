@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <ncurses.h>
+#include <time.h>
 
 int rows,columns; // window size
 
@@ -22,15 +23,19 @@ int kbhit () {
 }
 
 void display_clock() {
+	int centerx,centery;
 	while (1) {
 		clear();
-		mvprintw(10,10,"loop");
+		centerx = rows/2;
+		centery = columns/2;
+		mvprintw(centerx,centery-2,"%i,%i",centerx,centery);
 		refresh();	// Print it on to the real screen
 
 		if (kbhit()) {
 			return;
 		}
 
+		getmaxyx(stdscr, rows, columns); // get current window size
 		sleep(1);
 	}
 }
