@@ -36,19 +36,19 @@ void display_clock() {
 }
 
 int main() {
-	initscr();				/* Start curses mode 		  */
-	printw("Welcome to Curses Clock\n");	/* Print welcome message	  */
-	refresh();				/* Print it on to the real screen */
+	initscr();				// Start curses mode
+	printw("Welcome to Curses Clock\n");	// Print welcome message
+	refresh();				// Print it on to the real screen
 
 	initializations();
 	printw("\ninitializations complete\n");
 	printw("(rows=%i columns=%i)\n", rows, columns);
-	refresh();				/* Print it on to the real screen */
+	refresh();	// Print it on to the real screen
 	sleep(1);
 	
 	display_clock(); // show the clock
 
-	endwin();			/* End curses mode		  */
+	endwin();	// End curses mode
 
 	return 0;
 }
