@@ -8,6 +8,21 @@
 
 int rows,columns; // window size
 
+static const gchar *default_config = "\
+{\
+	\"timezones\": [\
+		\"\", # local\
+                \"America/New_York\",\
+                \"GMT\",\
+                \"Europe/Paris\",\
+                \"Asia/Baghdad\",\
+                \"Asia/Singapore\",\
+                \"Asia/Tokyo\",\
+	],\
+	\"font\": \"Lat2-VGA8.psf.gz\",\
+}\
+";
+
 void initializations() {
 	cbreak(); // cbreak so they don't have to hit enter to exit
 	getmaxyx(stdscr, rows, columns); // get current window size
