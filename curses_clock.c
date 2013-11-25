@@ -8,6 +8,7 @@
 #include <json-glib/json-glib.h>
 
 int rows,columns; // window size
+gchar *font;
 
 static const gchar *default_config = "\
 {\
@@ -27,6 +28,7 @@ static const gchar *default_config = "\
 void initializations() {
 	JsonParser *parser;
 	JsonNode *root;
+	JsonObject *jsonObj;
 	GError *error;
 
 #if !defined(GLIB_VERSION_2_36) 
@@ -46,8 +48,12 @@ void initializations() {
 	}
 
 	root = json_parser_get_root (parser);
+	jsonObj = json_node_get_object(root);
+	font = json_object_get_string_member(jsonObj,"font");
+	printw("font=%s\n",font);
 
 	/* manipulate the object tree and then exit */
+	
 
 	g_object_unref (parser);
 
