@@ -24,7 +24,7 @@ static const gchar *default_config = "\
 ";
 
 void initializations() {
-	cbreak(); // cbreak so they don't have to hit enter to exit
+//	cbreak(); // cbreak so they don't have to hit enter to exit
 	getmaxyx(stdscr, rows, columns); // get current window size
 	nodelay(stdscr, TRUE); // read characters in non-blocking mode
 }
@@ -80,6 +80,8 @@ int main() {
 	display_clock(); // show the clock
 
 	endwin();	// End curses mode
+
+	printf("exiting because the user hit a key\n");
 
 	return 0;
 }
