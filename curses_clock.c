@@ -1,29 +1,56 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ncurses.h>
 #include <time.h>
 #include <string.h>
+#include <glib-object.h>
 #include <json-glib/json-glib.h>
-#include <json-glib/json-gobject.h>
 
 int rows,columns; // window size
 
 static const gchar *default_config = "\
 {\
 	\"timezones\": [\
-		\"\", # local\
+		\"\",\
                 \"America/New_York\",\
                 \"GMT\",\
                 \"Europe/Paris\",\
                 \"Asia/Baghdad\",\
                 \"Asia/Singapore\",\
-                \"Asia/Tokyo\",\
+                \"Asia/Tokyo\"\
 	],\
-	\"font\": \"Lat2-VGA8.psf.gz\",\
+	\"font\": \"Lat2-VGA8.psf.gz\"\
 }\
 ";
 
 void initializations() {
+	JsonParser *parser;
+	JsonNode *root;
+	GError *error;
+
+#if !defined(GLIB_VERSION_2_36) 
+	g_type_init(); 
+#endif 
+	parser = json_parser_new ();
+
+	error = NULL;
+	json_parser_load_from_data (parser, default_config, strlen(default_config), &error);
+	if (error) {
+		endwin();
+		g_print ("Unable to parse config: %s\n", error->message);
+		g_print("%s\n",default_config);
+		g_error_free (error);
+		g_object_unref (parser);
+		exit(EXIT_FAILURE);
+	}
+
+	root = json_parser_get_root (parser);
+
+	/* manipulate the object tree and then exit */
+
+	g_object_unref (parser);
+
 //	cbreak(); // cbreak so they don't have to hit enter to exit
 	getmaxyx(stdscr, rows, columns); // get current window size
 	nodelay(stdscr, TRUE); // read characters in non-blocking mode
