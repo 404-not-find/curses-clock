@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ncurses.h>
 #include <time.h>
+#include <string.h>
 
 int rows,columns; // window size
 
