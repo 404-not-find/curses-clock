@@ -13,3 +13,4 @@ Build Requirements
 ------------------
 
 * ncurses headers and libs (package libncurses5-dev in debian, ??? in RH)
+* glib-json (package libjson-glib-dev in debian)

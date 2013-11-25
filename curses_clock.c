@@ -3,6 +3,8 @@
 #include <ncurses.h>
 #include <time.h>
 #include <string.h>
+#include <json-glib/json-glib.h>
+#include <json-glib/json-gobject.h>
 
 int rows,columns; // window size
 
