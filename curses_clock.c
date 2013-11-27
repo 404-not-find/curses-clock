@@ -8,7 +8,7 @@
 #include <json-glib/json-glib.h>
 
 int rows,columns; // window size
-gchar *font;
+const gchar *font;
 
 static const gchar *default_config = "\
 {\
@@ -23,7 +23,8 @@ static const gchar *default_config = "\
 	],\
 	\"font\": \"Lat2-VGA8.psf.gz\",\
 	\"fontpath\": [\
-		\"/usr/share/consolefonts\"\
+		\"/usr/share/consolefonts\",\
+		\"/home/chicks/consolefonts\"\
 	]\
 }\
 ";
@@ -33,6 +34,7 @@ void initializations() {
 	JsonNode *root;
 	JsonObject *jsonObj;
 	GError *error;
+	JsonArray *fontpath;
 
 	// parse JSON
 #if !defined(GLIB_VERSION_2_36) 
@@ -59,8 +61,16 @@ void initializations() {
 	printw("font=%s\n",font);
 
 	// get fontpath
+	fontpath = json_object_get_array_member(jsonObj,"fontpath");
 
 	// does font exist?
+	for (guint index = 0; index < json_array_get_length(fontpath); index++) {
+		const gchar *thispath;
+		thispath = json_array_get_string_element(fontpath, index);
+		printw("thispath=%s\n",thispath);
+		refresh();	// Print it on to the real screen
+	}
+	sleep(3);
 
 	// clean up
 	g_object_unref (parser);
