@@ -18,7 +18,6 @@ Build Requirements
 TODO
 ----
 
-* fontpath
 * parse PSF
 * print tall numbers and letters
 * multiple timezones

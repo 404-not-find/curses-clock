@@ -1,9 +1,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <ncurses.h>
 #include <time.h>
 #include <string.h>
+#include <glib.h>
 #include <glib-object.h>
 #include <json-glib/json-glib.h>
 
@@ -28,6 +30,17 @@ static const gchar *default_config = "\
 	]\
 }\
 ";
+
+
+int file_exists (char * fileName) {
+	struct stat buf;
+	int i = stat ( fileName, &buf );
+	/* File found */
+	if ( i == 0 ) {
+		return 1;
+	}
+	return 0;
+}
 
 void initializations() {
 	JsonParser *parser;
@@ -58,7 +71,7 @@ void initializations() {
 
 	// get font
 	font = json_object_get_string_member(jsonObj,"font");
-	printw("font=%s\n",font);
+//	printw("font=%s\n",font);
 
 	// get fontpath
 	fontpath = json_object_get_array_member(jsonObj,"fontpath");
@@ -67,7 +80,12 @@ void initializations() {
 	for (guint index = 0; index < json_array_get_length(fontpath); index++) {
 		const gchar *thispath;
 		thispath = json_array_get_string_element(fontpath, index);
-		printw("thispath=%s\n",thispath);
+//		printw("thispath=%s\n",thispath);
+		gchar * check_file = g_strconcat(thispath,"/",font,NULL);
+		if ( file_exists(check_file) ) {
+			font = check_file;
+			printw("found font=%s\n",font);
+		}
 		refresh();	// Print it on to the real screen
 	}
 	sleep(3);
