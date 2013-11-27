@@ -5,7 +5,9 @@
 #include <ncurses.h>
 #include <time.h>
 #include <string.h>
+#include <fcntl.h>
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <glib-object.h>
 #include <json-glib/json-glib.h>
 
@@ -39,6 +41,20 @@ int file_exists (char * fileName) {
 	if ( i == 0 ) {
 		return 1;
 	}
+	return 0;
+}
+
+int read_font (const char * filename) {
+	char buffer[10];
+	int fh = g_open(filename,O_RDONLY,S_IRUSR|S_IWUSR);
+
+	read(fh,&buffer,sizeof(buffer));
+
+	printw("%x %x\n",buffer[0],buffer[1]);
+
+//	if (buffer == 0x1f9b) {
+//	}
+
 	return 0;
 }
 
@@ -86,8 +102,13 @@ void initializations() {
 			font = check_file;
 			printw("found font=%s\n",font);
 		}
-		refresh();	// Print it on to the real screen
 	}
+
+	// read font in
+	read_font(font);
+
+	// handy for debugging
+	refresh();	// Print it on to the real screen
 	sleep(3);
 
 	// clean up
