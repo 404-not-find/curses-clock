@@ -21,7 +21,10 @@ static const gchar *default_config = "\
                 \"Asia/Singapore\",\
                 \"Asia/Tokyo\"\
 	],\
-	\"font\": \"Lat2-VGA8.psf.gz\"\
+	\"font\": \"Lat2-VGA8.psf.gz\",\
+	\"fontpath\": [\
+		\"/usr/share/consolefonts\"\
+	]\
 }\
 ";
 
@@ -31,6 +34,7 @@ void initializations() {
 	JsonObject *jsonObj;
 	GError *error;
 
+	// parse JSON
 #if !defined(GLIB_VERSION_2_36) 
 	g_type_init(); 
 #endif 
@@ -49,11 +53,14 @@ void initializations() {
 
 	root = json_parser_get_root (parser);
 	jsonObj = json_node_get_object(root);
+
+	// get font
 	font = json_object_get_string_member(jsonObj,"font");
 	printw("font=%s\n",font);
 
-	/* manipulate the object tree and then exit */
-	
+	// get fontpath
+
+	// does font exist?
 
 	g_object_unref (parser);
 
