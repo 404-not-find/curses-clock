@@ -18,7 +18,9 @@ Build Requirements
 TODO
 ----
 
-* tall numbers and letters (steal characters from tmux or elsewhere)
+* fontpath
+* parse PSF
+* print tall numbers and letters
 * multiple timezones
 * color
 * BUG: handle window resizing

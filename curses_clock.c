@@ -62,6 +62,7 @@ void initializations() {
 
 	// does font exist?
 
+	// clean up
 	g_object_unref (parser);
 
 //	cbreak(); // cbreak so they don't have to hit enter to exit
