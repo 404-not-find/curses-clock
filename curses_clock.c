@@ -50,7 +50,8 @@ int read_font (const char * filename) {
 
 	read(fh,&buffer,sizeof(buffer));
 
-	printw("%x %x\n",buffer[0],buffer[1]);
+	printf("%x %x\n",buffer[0],buffer[1]);
+	exit(42);
 
 //	if (buffer == 0x1f9b) {
 //	}
@@ -87,7 +88,7 @@ void initializations() {
 
 	// get font
 	font = json_object_get_string_member(jsonObj,"font");
-//	printw("font=%s\n",font);
+//	printf("font=%s\n",font);
 
 	// get fontpath
 	fontpath = json_object_get_array_member(jsonObj,"fontpath");
@@ -96,11 +97,11 @@ void initializations() {
 	for (guint index = 0; index < json_array_get_length(fontpath); index++) {
 		const gchar *thispath;
 		thispath = json_array_get_string_element(fontpath, index);
-//		printw("thispath=%s\n",thispath);
+//		printf("thispath=%s\n",thispath);
 		gchar * check_file = g_strconcat(thispath,"/",font,NULL);
 		if ( file_exists(check_file) ) {
 			font = check_file;
-			printw("found font=%s\n",font);
+			printf("found font=%s\n",font);
 		}
 	}
 
@@ -157,11 +158,10 @@ void display_clock() {
 }
 
 int main() {
-	initscr();				// Start curses mode
-	printw("Welcome to Curses Clock\n");	// Print welcome message
-	refresh();				// Print it on to the real screen
+	printf("Welcome to Curses Clock\n");	// Print welcome message
 
 	initializations();
+	initscr();	// Start curses mode
 	printw("\ninitializations complete\n");
 	printw("(rows=%i columns=%i)\n", rows, columns);
 	refresh();	// Print it on to the real screen
