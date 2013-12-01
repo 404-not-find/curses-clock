@@ -48,9 +48,14 @@ int read_font (const char * filename) {
 	char buffer[10];
 	int fh = g_open(filename,O_RDONLY,S_IRUSR|S_IWUSR);
 
-	read(fh,&buffer,sizeof(buffer));
+	read(fh,&buffer,2);
 
-	printf("%x %x\n",buffer[0],buffer[1]);
+	printf("%x %x\n",buffer[0],buffer[1] & 0xff);
+	if ((buffer[0] == 0x1f) && ((buffer[1] & 0xff) == 0x8b)) {
+		printf("font %s is compressed\n",filename);
+	} else {
+		printf("font %s is NOT compressed\n",filename);
+	}
 	exit(42);
 
 //	if (buffer == 0x1f9b) {
