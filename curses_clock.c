@@ -48,21 +48,33 @@ int file_exists (char * fileName) {
 int read_font (const char * filename) {
 	char buffer[10];
 	gint pipefds[2];
-	GError *error;
-	int fh = g_open(filename,O_RDONLY,S_IRUSR|S_IWUSR);
+	int compressed = 0;
 
-	read(fh,&buffer,2);
+	FILE * fh = g_fopen(filename,"r");
+
+	fread(&buffer,2,1,fh);
 
 	printf("%x %x\n",buffer[0],buffer[1] & 0xff);
 	if ((buffer[0] == 0x1f) && ((buffer[1] & 0xff) == 0x8b)) {
+		char *base_cmd = "/bin/gzip -c ";
+		compressed++;
 		printf("font %s is compressed\n",filename);
+		fclose(fh);
+
+		gchar * cmd = g_strconcat(base_cmd,filename,NULL);
+		fh = popen(cmd,"r");
+		if (fh == NULL) {
+			printf("gzip pipe open failed: %s",strerror(errno));
+			exit(1);
+		}
 	} else {
 		printf("font %s is NOT compressed\n",filename);
 	}
 
-	if (!g_unix_open_pipe(pipefds, FD_CLOEXEC, &error)) {
-		printf("gzip pipe open failed: %s",strerror(errno));
-		exit(1);
+	if (compressed) {
+		pclose(fh);
+	} else {
+		fclose(fh);
 	}
 	exit(42);
 
