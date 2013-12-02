@@ -9,6 +9,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>
+#include <glib-unix.h>
 #include <json-glib/json-glib.h>
 
 int rows,columns; // window size
@@ -46,6 +47,8 @@ int file_exists (char * fileName) {
 
 int read_font (const char * filename) {
 	char buffer[10];
+	gint pipefds[2];
+	GError *error;
 	int fh = g_open(filename,O_RDONLY,S_IRUSR|S_IWUSR);
 
 	read(fh,&buffer,2);
@@ -56,10 +59,12 @@ int read_font (const char * filename) {
 	} else {
 		printf("font %s is NOT compressed\n",filename);
 	}
-	exit(42);
 
-//	if (buffer == 0x1f9b) {
-//	}
+	if (!g_unix_open_pipe(pipefds, FD_CLOEXEC, &error)) {
+		printf("gzip pipe open failed: %s",strerror(errno));
+		exit(1);
+	}
+	exit(42);
 
 	return 0;
 }
