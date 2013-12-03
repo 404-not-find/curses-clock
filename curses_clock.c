@@ -47,28 +47,41 @@ int file_exists (char * fileName) {
 
 int read_font (const char * filename) {
 	char buffer[10];
+	char font[128*1024]; // the biggest I've seen in the wild is <30k
 	gint pipefds[2];
 	int compressed = 0;
+	size_t got;
 
 	FILE * fh = g_fopen(filename,"r");
 
 	fread(&buffer,2,1,fh);
 
-	printf("%x %x\n",buffer[0],buffer[1] & 0xff);
+//	printf("%x %x\n",buffer[0],buffer[1] & 0xff);
 	if ((buffer[0] == 0x1f) && ((buffer[1] & 0xff) == 0x8b)) {
 		char *base_cmd = "/bin/gzip -c ";
 		compressed++;
-		printf("font %s is compressed\n",filename);
+//		printf("font %s is compressed\n",filename);
 		fclose(fh);
 
 		gchar * cmd = g_strconcat(base_cmd,filename,NULL);
 		fh = popen(cmd,"r");
 		if (fh == NULL) {
-			printf("gzip pipe open failed: %s",strerror(errno));
+			printf("ERROR: gzip pipe open failed: %s",strerror(errno));
 			exit(1);
 		}
 	} else {
 		printf("font %s is NOT compressed\n",filename);
+		// TODO: rewind fh
+		exit(3);
+	}
+
+	got = fread(&font,1,sizeof(font),fh);
+
+	printf("font %s is %i bytes uncompressed\n",filename,(int) got);
+
+	if (got == sizeof(font)) {
+		printf("ERROR: font %s is bigger than our buffer can handle, exiting.\n",filename);
+		exit(2);
 	}
 
 	if (compressed) {
@@ -76,7 +89,7 @@ int read_font (const char * filename) {
 	} else {
 		fclose(fh);
 	}
-	exit(42);
+	exit(42); // TODO: remove after read_font() debugged
 
 	return 0;
 }
