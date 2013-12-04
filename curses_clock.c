@@ -58,7 +58,7 @@ int read_font (const char * filename) {
 
 //	printf("%x %x\n",buffer[0],buffer[1] & 0xff);
 	if ((buffer[0] == 0x1f) && ((buffer[1] & 0xff) == 0x8b)) {
-		char *base_cmd = "/bin/gzip -c ";
+		char *base_cmd = "/bin/gzip -dc ";
 		compressed++;
 //		printf("font %s is compressed\n",filename);
 		fclose(fh);
