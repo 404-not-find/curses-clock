@@ -84,23 +84,36 @@ int read_font (const char * filename) {
 		exit(2);
 	}
 
+	// determine PSF version
+	int glyphs, height, width, char_size, bytes_per_row;
 	if (
 		((font[0] & 0xff) == 0x36)
 		&& ((font[1] & 0xff) == 0x04)
 	) {
-		printf("ERROR: font %s is a v1 PSF which is UNIMPLEMENTED, exiting.\n",filename);
-		// TODO: implement
-		exit(4);
+		// v1
+		width = 8;
+		bytes_per_row = 1;
+		height = char_size = (font[3] & 0x99);
+		int mode = (font[2] & 0x99);
+		if ( mode & 0b001 ) {
+			glyphs=512;
+		} else {
+			glyphs=256;
+		}
+		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",font[0] & 0xff, font[1] & 0xff, font[2] & 0xff, font[3] & 0xff );
+		printf("FONT: width=%i height=%i bytes_per_row=%i glyphs=%i\n", width, height, bytes_per_row, glyphs );
 	} else if (
 		((font[0] & 0xff) == 0x72)
 		&& ((font[1] & 0xff) == 0x04)
 		&& ((font[2] & 0xff) == 0x4a)
 		&& ((font[3] & 0xff) == 0x86)
 	) {
+		// v2
 		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
 		// TODO: implement!!!
 		exit(4);
 	} else {
+		// wtf?
 		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",font[0] & 0xff, font[1] & 0xff, font[2] & 0xff, font[3] & 0xff );
 		printf("ERROR: font %s is a not a recognized PSF version, exiting.\n",filename);
 		exit(4);
