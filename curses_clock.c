@@ -84,6 +84,29 @@ int read_font (const char * filename) {
 		exit(2);
 	}
 
+	if (
+		((font[0] & 0xff) == 0x36)
+		&& ((font[1] & 0xff) == 0x04)
+	) {
+		printf("ERROR: font %s is a v1 PSF which is UNIMPLEMENTED, exiting.\n",filename);
+		// TODO: implement
+		exit(4);
+	} else if (
+		((font[0] & 0xff) == 0x72)
+		&& ((font[1] & 0xff) == 0x04)
+		&& ((font[2] & 0xff) == 0x4a)
+		&& ((font[3] & 0xff) == 0x86)
+	) {
+		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
+		// TODO: implement!!!
+		exit(4);
+	} else {
+		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",font[0] & 0xff, font[1] & 0xff, font[2] & 0xff, font[3] & 0xff );
+		printf("ERROR: font %s is a not a recognized PSF version, exiting.\n",filename);
+		exit(4);
+	}
+
+	// clean up fh
 	if (compressed) {
 		pclose(fh);
 	} else {
