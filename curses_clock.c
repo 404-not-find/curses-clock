@@ -45,6 +45,17 @@ int file_exists (char * fileName) {
 	return 0;
 }
 
+const char *byte_to_binary(int x) {
+    static char b[9];
+    b[0] = '\0';
+
+    for (int z = 128; z > 0; z >>= 1) {
+        strcat(b, ((x & z) == z) ? "X" : ".");
+    }
+
+    return b;
+}
+
 int read_font (const char * filename) {
 	char buffer[10];
 	char font[128*1024]; // the biggest I've seen in the wild is <30k
@@ -85,7 +96,7 @@ int read_font (const char * filename) {
 	}
 
 	// determine PSF version
-	int glyphs, height, width, char_size, bytes_per_row;
+	int glyphs, height, width, char_size, bytes_per_row, font_start;
 	if (
 		((font[0] & 0xff) == 0x36)
 		&& ((font[1] & 0xff) == 0x04)
@@ -93,6 +104,7 @@ int read_font (const char * filename) {
 		// v1
 		width = 8;
 		bytes_per_row = 1;
+		font_start=4;
 		height = char_size = (font[3] & 0x99);
 		int mode = (font[2] & 0x99);
 		if ( mode & 0b001 ) {
@@ -117,6 +129,15 @@ int read_font (const char * filename) {
 		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",font[0] & 0xff, font[1] & 0xff, font[2] & 0xff, font[3] & 0xff );
 		printf("ERROR: font %s is a not a recognized PSF version, exiting.\n",filename);
 		exit(4);
+	}
+
+	for (int c = 0; c < glyphs; c++) {
+		printf("c%i starts at %i:\n", c, font_start );
+		for(int l = 0; l < height; l++) {
+			unsigned char segment = font[font_start+l] & 0xff;
+			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
+		}
+		font_start += height;
 	}
 
 	// clean up fh

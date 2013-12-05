@@ -27,3 +27,4 @@ TODO
 Acknowledgements
 ----------------
 * https://github.com/talamus/rw-psf provided the best way to learn how to parse PSF that I have found yet.  Perl++
+* http://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format made a good starting place for my byte_to_binary()
