@@ -99,24 +99,23 @@ int read_font (const char * filename) {
 	}
 
 	// determine PSF version
-	int glyphs, height, width, char_size, bytes_per_row, font_start;
 	if (
 		((myfont.data[0] & 0xff) == 0x36)
 		&& ((myfont.data[1] & 0xff) == 0x04)
 	) {
 		// v1
-		width = 8;
-		bytes_per_row = 1;
-		font_start=4;
-		height = char_size = (myfont.data[3] & 0x99);
+		myfont.width = 8;
+		myfont.bytes_per_row = 1;
+		myfont.font_start=4;
+		myfont.height = myfont.char_size = (myfont.data[3] & 0x99);
 		int mode = (myfont.data[2] & 0x99);
 		if ( mode & 0b001 ) {
-			glyphs=512;
+			myfont.glyphs=512;
 		} else {
-			glyphs=256;
+			myfont.glyphs=256;
 		}
 		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
-		printf("FONT: width=%i height=%i bytes_per_row=%i glyphs=%i\n", width, height, bytes_per_row, glyphs );
+		printf("FONT: width=%i height=%i bytes_per_row=%i glyphs=%i\n", myfont.width, myfont.height, myfont.bytes_per_row, myfont.glyphs );
 	} else if (
 		((myfont.data[0] & 0xff) == 0x72)
 		&& ((myfont.data[1] & 0xff) == 0x04)
@@ -134,13 +133,14 @@ int read_font (const char * filename) {
 		exit(4);
 	}
 
-	for (int c = 0; c < glyphs; c++) {
-		printf("c%i starts at %i:\n", c, font_start );
-		for(int l = 0; l < height; l++) {
-			unsigned char segment = myfont.data[font_start+l] & 0xff;
+	int font_pos = myfont.font_start;
+	for (int c = 0; c < myfont.glyphs; c++) {
+		printf("c%i starts at %i:\n", c, font_pos );
+		for(int l = 0; l < myfont.height; l++) {
+			unsigned char segment = myfont.data[font_pos+l] & 0xff;
 			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
 		}
-		font_start += height;
+		font_pos += myfont.height;
 	}
 
 	// clean up fh
