@@ -13,7 +13,6 @@
 #include <json-glib/json-glib.h>
 
 int rows,columns; // window size
-const gchar *font;
 
 static const gchar *default_config = "\
 {\
@@ -34,6 +33,10 @@ static const gchar *default_config = "\
 }\
 ";
 
+struct Font {
+	int glyphs, height, width, char_size, bytes_per_row, font_start;
+	char data[128*1024]; // the biggest I've seen in the wild is <30k
+};
 
 int file_exists (char * fileName) {
 	struct stat buf;
@@ -58,7 +61,7 @@ const char *byte_to_binary(int x) {
 
 int read_font (const char * filename) {
 	char buffer[10];
-	char font[128*1024]; // the biggest I've seen in the wild is <30k
+	struct Font myfont;
 	gint pipefds[2];
 	int compressed = 0;
 	size_t got;
@@ -86,11 +89,11 @@ int read_font (const char * filename) {
 		exit(3);
 	}
 
-	got = fread(&font,1,sizeof(font),fh);
+	got = fread(&myfont.data,1,sizeof(myfont.data),fh);
 
 	printf("font %s is %i bytes uncompressed\n",filename,(int) got);
 
-	if (got == sizeof(font)) {
+	if (got == sizeof(myfont.data)) {
 		printf("ERROR: font %s is bigger than our buffer can handle, exiting.\n",filename);
 		exit(2);
 	}
@@ -98,27 +101,27 @@ int read_font (const char * filename) {
 	// determine PSF version
 	int glyphs, height, width, char_size, bytes_per_row, font_start;
 	if (
-		((font[0] & 0xff) == 0x36)
-		&& ((font[1] & 0xff) == 0x04)
+		((myfont.data[0] & 0xff) == 0x36)
+		&& ((myfont.data[1] & 0xff) == 0x04)
 	) {
 		// v1
 		width = 8;
 		bytes_per_row = 1;
 		font_start=4;
-		height = char_size = (font[3] & 0x99);
-		int mode = (font[2] & 0x99);
+		height = char_size = (myfont.data[3] & 0x99);
+		int mode = (myfont.data[2] & 0x99);
 		if ( mode & 0b001 ) {
 			glyphs=512;
 		} else {
 			glyphs=256;
 		}
-		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",font[0] & 0xff, font[1] & 0xff, font[2] & 0xff, font[3] & 0xff );
+		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
 		printf("FONT: width=%i height=%i bytes_per_row=%i glyphs=%i\n", width, height, bytes_per_row, glyphs );
 	} else if (
-		((font[0] & 0xff) == 0x72)
-		&& ((font[1] & 0xff) == 0x04)
-		&& ((font[2] & 0xff) == 0x4a)
-		&& ((font[3] & 0xff) == 0x86)
+		((myfont.data[0] & 0xff) == 0x72)
+		&& ((myfont.data[1] & 0xff) == 0x04)
+		&& ((myfont.data[2] & 0xff) == 0x4a)
+		&& ((myfont.data[3] & 0xff) == 0x86)
 	) {
 		// v2
 		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
@@ -126,7 +129,7 @@ int read_font (const char * filename) {
 		exit(4);
 	} else {
 		// wtf?
-		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",font[0] & 0xff, font[1] & 0xff, font[2] & 0xff, font[3] & 0xff );
+		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
 		printf("ERROR: font %s is a not a recognized PSF version, exiting.\n",filename);
 		exit(4);
 	}
@@ -134,7 +137,7 @@ int read_font (const char * filename) {
 	for (int c = 0; c < glyphs; c++) {
 		printf("c%i starts at %i:\n", c, font_start );
 		for(int l = 0; l < height; l++) {
-			unsigned char segment = font[font_start+l] & 0xff;
+			unsigned char segment = myfont.data[font_start+l] & 0xff;
 			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
 		}
 		font_start += height;
@@ -179,7 +182,7 @@ void initializations() {
 	jsonObj = json_node_get_object(root);
 
 	// get font
-	font = json_object_get_string_member(jsonObj,"font");
+	const gchar *font = json_object_get_string_member(jsonObj,"font");
 //	printf("font=%s\n",font);
 
 	// get fontpath
