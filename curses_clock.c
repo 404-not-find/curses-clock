@@ -270,6 +270,7 @@ int main() {
 
 	initializations();
 	initscr();	// Start curses mode
+	getmaxyx(stdscr, rows, columns); // get current window size
 	printw("\ninitializations complete\n");
 	printw("(rows=%i columns=%i)\n", rows, columns);
 	refresh();	// Print it on to the real screen
