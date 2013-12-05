@@ -236,7 +236,8 @@ int kbhit () {
 	}
 }
 
-int big_display () {
+int big_display (int x, int y, char *string_small) {
+	mvprintw(x,y,"%s",string_small);
 }
 
 void display_clock() {
@@ -254,6 +255,7 @@ void display_clock() {
 		width = strlen(time_string);
 
 		mvprintw(centerx,centery-(width/2),"%s",time_string);
+		big_display(centerx-12,3,time_string);
 		refresh();	// Print it on to the real screen
 
 		if (kbhit()) {
