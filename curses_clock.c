@@ -12,6 +12,9 @@
 #include <glib-unix.h>
 #include <json-glib/json-glib.h>
 
+//
+// global variables
+//
 int rows,columns; // window size
 
 static const gchar *default_config = "\
@@ -36,7 +39,15 @@ static const gchar *default_config = "\
 struct Font {
 	int glyphs, height, width, char_size, bytes_per_row, font_start;
 	char data[128*1024]; // the biggest I've seen in the wild is <30k
+	int charmap[512];
 };
+
+struct Font myfont;
+
+
+/********************************
+ *        functions
+ */
 
 int file_exists (char * fileName) {
 	struct stat buf;
@@ -61,7 +72,6 @@ const char *byte_to_binary(int x) {
 
 int read_font (const char * filename) {
 	char buffer[10];
-	struct Font myfont;
 	gint pipefds[2];
 	int compressed = 0;
 	size_t got;
@@ -135,12 +145,13 @@ int read_font (const char * filename) {
 
 	int font_pos = myfont.font_start;
 	for (int c = 0; c < myfont.glyphs; c++) {
-		printf("c%i starts at %i:\n", c, font_pos );
-		for(int l = 0; l < myfont.height; l++) {
-			unsigned char segment = myfont.data[font_pos+l] & 0xff;
-			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
-		}
+//		printf("c%i starts at %i:\n", c, font_pos );
+//		for(int l = 0; l < myfont.height; l++) {
+//			unsigned char segment = myfont.data[font_pos+l] & 0xff;
+//			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
+//		}
 		font_pos += myfont.height;
+		myfont.charmap[c] = font_pos;
 	}
 
 	// clean up fh
@@ -149,7 +160,6 @@ int read_font (const char * filename) {
 	} else {
 		fclose(fh);
 	}
-	exit(42); // TODO: remove after read_font() debugged
 
 	return 0;
 }
@@ -201,7 +211,7 @@ void initializations() {
 	}
 
 	// read font in
-	read_font(font);
+	read_font(font); // exits on its own errors
 
 	// handy for debugging
 	refresh();	// Print it on to the real screen
@@ -224,6 +234,9 @@ int kbhit () {
 	} else {
 		return(0);
 	}
+}
+
+int big_display () {
 }
 
 void display_clock() {
