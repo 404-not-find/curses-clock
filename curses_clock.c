@@ -236,8 +236,30 @@ int kbhit () {
 	}
 }
 
+unsigned int get_segment (char c, int line) {
+	return myfont.data[ myfont.charmap[c] + line ];
+}
+
 int big_display (int x, int y, char *string_small) {
 	mvprintw(x,y,"%s",string_small);
+	x++;
+
+	for (int line=0; line < myfont.height; line++) {
+		for (int i=0; i < strlen(string_small); i++) {
+			unsigned int raw_segment = get_segment(string_small[i],line);
+				
+			static char b[99];
+			b[0] = '\0';
+
+			for (int z = 128; z > 0; z >>= 1) {
+				strcat(b, ((raw_segment & z) == z) ? "X" : " ");
+			}
+
+			int thisy = y + i * (myfont.width + 1);
+			mvprintw(x,thisy,"%s",b);
+		}
+		x++;
+	}
 }
 
 void display_clock() {
