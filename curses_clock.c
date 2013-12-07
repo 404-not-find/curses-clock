@@ -39,7 +39,7 @@ static const gchar *default_config = "\
 struct Font {
 	int glyphs, height, width, char_size, bytes_per_row, font_start;
 	char data[128*1024]; // the biggest I've seen in the wild is <30k
-	int charmap[512];
+	unsigned int charmap[512];
 };
 
 struct Font myfont;
@@ -143,15 +143,17 @@ int read_font (const char * filename) {
 		exit(4);
 	}
 
-	int font_pos = myfont.font_start;
+	unsigned int font_pos = myfont.font_start;
 	for (int c = 0; c < myfont.glyphs; c++) {
-//		printf("c%i starts at %i:\n", c, font_pos );
-//		for(int l = 0; l < myfont.height; l++) {
-//			unsigned char segment = myfont.data[font_pos+l] & 0xff;
-//			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
-//		}
-		font_pos += myfont.height;
+#if 0
+		printf("c=%i <<%c>> starts at %i:\n", c, c, font_pos );
+		for(int l = 0; l < myfont.height; l++) {
+			unsigned char segment = myfont.data[font_pos+l] & 0xff;
+			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
+		}
+#endif
 		myfont.charmap[c] = font_pos;
+		font_pos += myfont.height;
 	}
 
 	// clean up fh
@@ -215,7 +217,7 @@ void initializations() {
 
 	// handy for debugging
 	refresh();	// Print it on to the real screen
-	sleep(3);
+//	sleep(3);
 
 	// clean up
 	g_object_unref (parser);
@@ -236,7 +238,7 @@ int kbhit () {
 	}
 }
 
-unsigned int get_segment (char c, int line) {
+unsigned int get_segment (unsigned char c, int line) {
 	return myfont.data[ myfont.charmap[c] + line ];
 }
 
