@@ -280,9 +280,10 @@ void display_clock() {
 		big_display(centerx-12,3,time_string);
 		refresh();	// Print it on to the real screen
 
-		if (kbhit()) {
+/*		if (kbhit()) {
 			return;
 		}
+*/
 
 		getmaxyx(stdscr, rows, columns); // get current window size
 		sleep(1);
