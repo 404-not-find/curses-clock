@@ -304,6 +304,14 @@ int main() {
 
 	initializations();
 	initscr();	// Start curses mode
+
+	// color or death!
+	if (has_colors() == FALSE) {
+		endwin();
+		printf("no colors, no clock!");
+		exit(64);
+	}
+
 	getmaxyx(stdscr, rows, columns); // get current window size
 	printw("\ninitializations complete\n");
 	printw("(rows=%i columns=%i)\n", rows, columns);
