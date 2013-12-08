@@ -246,6 +246,8 @@ int big_display (int x, int y, char *string_small) {
 	mvprintw(x,y,"%s",string_small);
 	x++;
 
+	init_pair(1,COLOR_BLACK,COLOR_BLUE);
+
 	for (int line=0; line < myfont.height; line++) {
 		for (int i=0; i < strlen(string_small); i++) {
 			unsigned int raw_segment = get_segment(string_small[i],line);
@@ -258,7 +260,9 @@ int big_display (int x, int y, char *string_small) {
 			}
 
 			int thisy = y + i * (myfont.width + 1);
+			attron(COLOR_PAIR(1));
 			mvprintw(x,thisy,"%s",b);
+			attroff(COLOR_PAIR(1));
 		}
 		x++;
 	}
@@ -311,6 +315,7 @@ int main() {
 		printf("no colors, no clock!");
 		exit(64);
 	}
+	start_color();
 
 	getmaxyx(stdscr, rows, columns); // get current window size
 	printw("\ninitializations complete\n");
