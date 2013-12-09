@@ -273,7 +273,7 @@ int big_display (int x, int y, char *string_small) {
 void display_clock() {
 	int centerx,centery;
 	char* time_string;
-	gchar gtime_string[50];
+	gchar *gtime_string;
 	time_t now;
 	size_t width;
 	while (1) {
@@ -284,15 +284,17 @@ void display_clock() {
 		now=time(NULL);
 		time_string=ctime(&now);
 
-		GDate * date = g_date_new();
-		g_date_set_time_t(date,time(NULL));
-		g_date_strftime((gchar *)&gtime_string,sizeof(gtime_string),"%X %x",date);
+		GDateTime * date = g_date_time_new_now_local();
+		//g_date_strftime((gchar *)&gtime_string,sizeof(gtime_string),"%X %x",date);
+		gtime_string = g_date_time_format(date, "%H:%M");
+		const gchar *tz = g_date_time_get_timezone_abbreviation(date);
+		
 
 		gchar *foo = g_strdup_printf("%s",(char *)&gtime_string);
 
-		width = strlen(time_string);
-		mvprintw(centerx,centery-(width/2),"%s",time_string);
-		big_display(centerx-12,3,(char *)foo);
+		width = strlen(gtime_string);
+		mvprintw(centerx,centery-(width/2),"%s",gtime_string);
+		big_display(centerx-12,3,(char *)gtime_string);
 		refresh();	// Print it on to the real screen
 
 /*		if (kbhit()) {
