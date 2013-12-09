@@ -18,13 +18,12 @@ Build Requirements
 TODO
 ----
 
-* parse PSF
-* print tall numbers and letters
+* better color
 * multiple timezones
-* color
 * BUG: handle window resizing
 
 Acknowledgements
 ----------------
 * https://github.com/talamus/rw-psf provided the best way to learn how to parse PSF that I have found yet.  Perl++
 * http://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format made a good starting place for my byte_to_binary()
+* http://www.gtkforums.com/viewtopic.php?f=3&t=178486 for how to get time out of glib
