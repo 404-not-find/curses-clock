@@ -248,8 +248,10 @@ int big_display (int x, int y, char *string_small) {
 
 	init_pair(1,COLOR_BLACK,COLOR_BLUE);
 
+	int maxi = columns / (myfont.width + 1);
+
 	for (int line=0; line < myfont.height; line++) {
-		for (int i=0; i < strlen(string_small); i++) {
+		for (int i=0; i < strlen(string_small) && i<maxi; i++) {
 			unsigned int raw_segment = get_segment(string_small[i],line);
 				
 			static char b[99];
