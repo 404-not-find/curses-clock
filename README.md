@@ -1,7 +1,7 @@
 curses-clock
 ============
 
-A clock based on curses in C
+A clock based on curses in C that uses fixed-sized fonts (PSF) to allow varied displays.
 
 ![screen shot of default config](/docs/clock001.png)
 
