@@ -8,7 +8,7 @@ A clock based on curses in C
 Usage
 -----
 
-Run `make` to generate `cclock` and then run `cclock`.  Enjoy
+Run `make` to generate `cclock` and then run `./cclock`.  Enjoy.
 
 Inspirations
 ------------
