@@ -243,12 +243,11 @@ unsigned int get_segment (unsigned char c, int line) {
 }
 
 int big_display (int x, int y, char *string_small) {
-	mvprintw(x,y,"%s",string_small);
-	x++;
-
-	init_pair(1,COLOR_BLACK,COLOR_BLUE);
-
 	int maxi = columns / (myfont.width + 1);
+
+	// color for clock digits
+	init_pair(1,COLOR_BLACK,COLOR_BLUE);
+	attron(COLOR_PAIR(1));
 
 	for (int line=0; line < myfont.height; line++) {
 		for (int i=0; i < strlen(string_small) && i<maxi; i++) {
@@ -257,17 +256,21 @@ int big_display (int x, int y, char *string_small) {
 			static char b[99];
 			b[0] = '\0';
 
+			int segment = 0;
 			for (int z = 128; z > 0; z >>= 1) {
-				strcat(b, ((raw_segment & z) == z) ? "X" : " ");
+				if ((raw_segment & z) == z) {
+					int thisy = segment + y + i * (myfont.width + 1);
+					mvprintw(x,thisy," ",b);
+				}
+				segment++;
 			}
 
 			int thisy = y + i * (myfont.width + 1);
-			attron(COLOR_PAIR(1));
 			mvprintw(x,thisy,"%s",b);
-			attroff(COLOR_PAIR(1));
 		}
 		x++;
 	}
+	attroff(COLOR_PAIR(1));
 }
 
 void display_clock() {
