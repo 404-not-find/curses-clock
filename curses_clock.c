@@ -124,7 +124,7 @@ int read_font (const char * filename) {
 		} else {
 			myfont.glyphs=256;
 		}
-		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
+//		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
 		printf("FONT: width=%i height=%i bytes_per_row=%i glyphs=%i\n", myfont.width, myfont.height, myfont.bytes_per_row, myfont.glyphs );
 	} else if (
 		((myfont.data[0] & 0xff) == 0x72)
@@ -309,7 +309,8 @@ void display_clock() {
 }
 
 int main() {
-	printf("Welcome to Curses Clock\n");	// Print welcome message
+	printf("Welcome to Curses Clock\n");				// Print welcome message
+	printf("https://github.com/chicks-net/curses-clock\n\n");	// Print source URL
 
 	initializations();
 	initscr();	// Start curses mode
@@ -323,6 +324,8 @@ int main() {
 	start_color();
 
 	getmaxyx(stdscr, rows, columns); // get current window size
+	printw("Welcome to Curses Clock\n\n");				// Reprint welcome message
+	printw("https://github.com/chicks-net/curses-clock\n\n");	// Print source URL
 	printw("\ninitializations complete\n");
 	printw("(rows=%i columns=%i)\n", rows, columns);
 	refresh();	// Print it on to the real screen
