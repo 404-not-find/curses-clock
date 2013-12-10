@@ -44,6 +44,7 @@ struct Font {
 
 struct Font myfont;
 
+JsonArray *timezones;
 
 /********************************
  *        functions
@@ -215,6 +216,9 @@ void initializations() {
 	// read font in
 	read_font(font); // exits on its own errors
 
+	// get fontpath
+	timezones = json_object_get_array_member(jsonObj,"timezones");
+
 	// handy for debugging
 	refresh();	// Print it on to the real screen
 //	sleep(3);
@@ -242,11 +246,11 @@ unsigned int get_segment (unsigned char c, int line) {
 	return myfont.data[ myfont.charmap[c] + line ];
 }
 
-int big_display (int x, int y, char *string_small) {
+int big_display (int x, int y, char *string_small, short color) {
 	int maxi = columns / (myfont.width + 1);
 
 	// color for clock digits
-	init_pair(1,COLOR_BLACK,COLOR_BLUE);
+	init_pair(1,COLOR_BLACK,color);
 	attron(COLOR_PAIR(1));
 
 	for (int line=0; line < myfont.height; line++) {
@@ -291,11 +295,11 @@ void display_clock() {
 
 		gtime_string = g_date_time_format(date, "%H:%M:%S");
 		int big_width = strlen(gtime_string) * myfont.width;
-		big_display(centerx-4,centery-(big_width/2),(char *)gtime_string);
+		big_display(2,centery-(big_width/2),(char *)gtime_string,COLOR_RED);
 
 		const gchar *day = g_date_time_format(date, "%Z UTC%z %a %e %b %Y");
 		width = strlen(day);
-		mvprintw(centerx+(myfont.height/2),centery-(width/2),"%s",day);
+		mvprintw(2+myfont.height,centery-(width/2),"%s",day);
 		refresh();	// Print it on to the real screen
 
 /*		if (kbhit()) {
