@@ -3,7 +3,7 @@ curses-clock
 
 A clock based on curses in C
 
-![screen shot of default config](/docs/clock000.png)
+![screen shot of default config](/docs/clock001.png)
 
 Inspirations
 ------------
