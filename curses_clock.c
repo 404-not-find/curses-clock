@@ -196,7 +196,6 @@ void initializations() {
 
 	// get font
 	const gchar *font = json_object_get_string_member(jsonObj,"font");
-//	printf("font=%s\n",font);
 
 	// get fontpath
 	fontpath = json_object_get_array_member(jsonObj,"fontpath");
@@ -205,7 +204,6 @@ void initializations() {
 	for (guint index = 0; index < json_array_get_length(fontpath); index++) {
 		const gchar *thispath;
 		thispath = json_array_get_string_element(fontpath, index);
-//		printf("thispath=%s\n",thispath);
 		gchar * check_file = g_strconcat(thispath,"/",font,NULL);
 		if ( file_exists(check_file) ) {
 			font = check_file;
@@ -218,10 +216,6 @@ void initializations() {
 
 	// get fontpath
 	timezones = json_object_get_array_member(jsonObj,"timezones");
-
-	// handy for debugging
-	refresh();	// Print it on to the real screen
-//	sleep(3);
 
 	// clean up
 	g_object_unref (parser);
