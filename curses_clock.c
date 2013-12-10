@@ -251,8 +251,10 @@ int big_display (int x, int y, char *string_small, short color) {
 	int maxi = columns / (myfont.width + 1);
 
 	// color for clock digits
-	init_pair(1,COLOR_BLACK,color);
-	attron(COLOR_PAIR(1));
+	for (int c=0; c < 8; c++) {
+		init_pair(c,COLOR_BLACK,c);
+	}
+	attron(COLOR_PAIR(color));
 
 	for (int line=0; line < myfont.height; line++) {
 		for (int i=0; i < strlen(string_small) && i<maxi; i++) {
@@ -307,11 +309,18 @@ void display_clock() {
 		for (guint index = 0; timezones[index] != NULL; index++) {
 			char * tz = timezones[index];
 				
-			if (strlen(tz)) {
+			if (strlen(tz) && (top_line + myfont.height < rows)) {
 				GTimeZone * zone = g_time_zone_new(timezones[index]);
 				GDateTime * zoned_datetime = g_date_time_new_now(zone);
-				gchar * zoned_time_string = g_date_time_format(zoned_datetime, "%H:%M %Z UTC%z %a %e %b %Y");
-				mvprintw(top_line,4,"%s %s",zoned_time_string,timezones[index]);
+				gchar * zoned_time_string = g_date_time_format(zoned_datetime, "%H:%M");
+				//mvprintw(top_line,4,"%s %s",zoned_time_string,timezones[index]);
+				big_width = strlen(zoned_time_string) * myfont.width;
+				big_display(top_line,centery-(big_width/2),(char *)zoned_time_string,COLOR_BLUE);
+				top_line += myfont.height;
+
+				day = g_date_time_format(zoned_datetime, "%Z UTC%z %a %e %b %Y");
+				width = strlen(day);
+				mvprintw(top_line,centery-(width/2),"%s",day);
 				top_line += 2;
 			}
 		}
