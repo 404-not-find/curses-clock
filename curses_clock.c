@@ -288,16 +288,14 @@ void display_clock() {
 		time_string=ctime(&now);
 
 		GDateTime * date = g_date_time_new_now_local();
-		//g_date_strftime((gchar *)&gtime_string,sizeof(gtime_string),"%X %x",date);
-		gtime_string = g_date_time_format(date, "%H:%M");
-		const gchar *tz = g_date_time_get_timezone_abbreviation(date);
-		
 
-		gchar *foo = g_strdup_printf("%s",(char *)&gtime_string);
+		gtime_string = g_date_time_format(date, "%H:%M:%S");
+		int big_width = strlen(gtime_string) * myfont.width;
+		big_display(centerx-4,centery-(big_width/2),(char *)gtime_string);
 
-		width = strlen(gtime_string);
-		mvprintw(centerx,centery-(width/2),"%s",gtime_string);
-		big_display(centerx-12,3,(char *)gtime_string);
+		const gchar *day = g_date_time_format(date, "%Z UTC%z %a %e %b %Y");
+		width = strlen(day);
+		mvprintw(centerx+(myfont.height/2),centery-(width/2),"%s",day);
 		refresh();	// Print it on to the real screen
 
 /*		if (kbhit()) {
