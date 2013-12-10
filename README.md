@@ -3,6 +3,8 @@ curses-clock
 
 A clock based on curses in C
 
+![screen shot of default config](/docs/clock000.png)
+
 Inspirations
 ------------
 
@@ -18,8 +20,6 @@ Build Requirements
 TODO
 ----
 
-* better color
-* multiple timezones
 * BUG: handle window resizing
 
 Acknowledgements
