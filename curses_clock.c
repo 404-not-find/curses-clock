@@ -305,8 +305,15 @@ void display_clock() {
 		int top_line = 2 + myfont.height + 2;
 		// loop through timezones;
 		for (guint index = 0; timezones[index] != NULL; index++) {
-			mvprintw(top_line,4,"%s",timezones[index]);
-			top_line += 2;
+			char * tz = timezones[index];
+				
+			if (strlen(tz)) {
+				GTimeZone * zone = g_time_zone_new(timezones[index]);
+				GDateTime * zoned_datetime = g_date_time_new_now(zone);
+				gchar * zoned_time_string = g_date_time_format(zoned_datetime, "%H:%M %Z UTC%z %a %e %b %Y");
+				mvprintw(top_line,4,"%s %s",zoned_time_string,timezones[index]);
+				top_line += 2;
+			}
 		}
 
 		refresh();	// Print it on to the real screen
