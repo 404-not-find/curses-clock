@@ -44,7 +44,7 @@ struct Font {
 
 struct Font myfont;
 
-JsonArray *timezones;
+gchar *timezones[20];
 
 /********************************
  *        functions
@@ -214,8 +214,15 @@ void initializations() {
 	// read font in
 	read_font(font); // exits on its own errors
 
-	// get fontpath
-	timezones = json_object_get_array_member(jsonObj,"timezones");
+	// get timezones
+	JsonArray *timezones_handle = json_object_get_array_member(jsonObj,"timezones");
+	int tz_count = 0;
+	for (guint index = 0; index < json_array_get_length(timezones_handle); index++) {
+		timezones[index] =  g_strconcat(json_array_get_string_element(timezones_handle, index),NULL);
+		//printf("adding tz %s\n",timezones[index]);
+		tz_count++;
+	}
+	printf("displaying %i timezones\n",tz_count);
 
 	// clean up
 	g_object_unref (parser);
@@ -294,8 +301,15 @@ void display_clock() {
 		const gchar *day = g_date_time_format(date, "%Z UTC%z %a %e %b %Y");
 		width = strlen(day);
 		mvprintw(2+myfont.height,centery-(width/2),"%s",day);
-		refresh();	// Print it on to the real screen
 
+		int top_line = 2 + myfont.height + 2;
+		// loop through timezones;
+		for (guint index = 0; timezones[index] != NULL; index++) {
+			mvprintw(top_line,4,"%s",timezones[index]);
+			top_line += 2;
+		}
+
+		refresh();	// Print it on to the real screen
 /*		if (kbhit()) {
 			return;
 		}
