@@ -28,7 +28,7 @@ static const gchar *default_config = "\
                 \"Asia/Singapore\",\
                 \"Asia/Tokyo\"\
 	],\
-	\"font\": \"Lat2-VGA8.psf.gz\",\
+	\"font\": \"Lat7-Terminus32x16.psf.gz\",\
 	\"fontpath\": [\
 		\"/usr/share/consolefonts\",\
 		\"/home/chicks/consolefonts\"\
@@ -129,7 +129,7 @@ int read_font (const char * filename) {
 		printf("FONT: width=%i height=%i bytes_per_row=%i glyphs=%i\n", myfont.width, myfont.height, myfont.bytes_per_row, myfont.glyphs );
 	} else if (
 		((myfont.data[0] & 0xff) == 0x72)
-		&& ((myfont.data[1] & 0xff) == 0x04)
+		&& ((myfont.data[1] & 0xff) == 0xb5)
 		&& ((myfont.data[2] & 0xff) == 0x4a)
 		&& ((myfont.data[3] & 0xff) == 0x86)
 	) {
