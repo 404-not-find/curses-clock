@@ -19,8 +19,8 @@ Inspirations
 Build Requirements
 ------------------
 
-* ncurses headers and libs (package libncurses5-dev in debian, ??? in RH)
-* glib-json (package libjson-glib-dev in debian)
+* ncurses headers and libs (package libncurses5-dev in debian, ncurses-devel in RH)
+* glib-json (package libjson-glib-dev in debian, json-glib-devel in RH)
 
 TODO
 ----
