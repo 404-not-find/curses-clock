@@ -21,12 +21,14 @@ Build Requirements
 
 * ncurses headers and libs (package libncurses5-dev in debian, ncurses-devel in RH)
 * glib-json (package libjson-glib-dev in debian, json-glib-devel in RH)
+* expects 64 bit system
 
 TODO
 ----
 
 * BUG: handle window resizing
 * BUG: segfaults on Fedora
+* BUG: portability to 32 bit (reading v2 PSF font headers)
 * check for json config in home directory, read it in
 * write out default config on request
 * error handling for unknown timezones
