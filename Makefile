@@ -1,4 +1,4 @@
-LIBS=-lncurses 
+LIBS=-lncurses -lm
 GLIB_INCLUDES:=$(shell pkg-config --libs --cflags glib-2.0)
 GLIB_JSON_INCLUDES:=$(shell pkg-config --libs --cflags json-glib-1.0)
 INCLUDES=${GLIB_INCLUDES} ${GLIB_JSON_INCLUDES}

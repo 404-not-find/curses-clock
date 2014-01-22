@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <fcntl.h>
+#include <math.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>
@@ -38,7 +39,19 @@ static const gchar *default_config = "\
 
 struct Font {
 	int glyphs, height, width, char_size, bytes_per_row, font_start;
-	char data[128*1024]; // the biggest I've seen in the wild is <30k
+	union {
+		char data[128*1024]; // the biggest I've seen in the wild is <30k
+		struct Header {
+			unsigned int magic;
+			unsigned int version;
+			unsigned int header_size;
+			unsigned int flags;
+			unsigned int glyphs;
+			unsigned int char_size;
+			unsigned int height;
+			unsigned int width;
+		} header;
+	};
 	unsigned int charmap[512];
 };
 
@@ -134,10 +147,48 @@ int read_font (const char * filename) {
 		&& ((myfont.data[3] & 0xff) == 0x86)
 	) {
 		// v2
-		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
-		printf("FONT[4-7]: x%02x x%02x x%02x x%02x\n",myfont.data[4] & 0xff, myfont.data[5] & 0xff, myfont.data[6] & 0xff, myfont.data[7] & 0xff );
-		printf("FONT[8-11]: x%02x x%02x x%02x x%02x\n",myfont.data[8] & 0xff, myfont.data[9] & 0xff, myfont.data[10] & 0xff, myfont.data[11] & 0xff );
+//		printf("FONT[4-7]: x%02x x%02x x%02x x%02x\n",myfont.data[4] & 0xff, myfont.data[5] & 0xff, myfont.data[6] & 0xff, myfont.data[7] & 0xff );
+//		printf("FONT[8-11]: x%02x x%02x x%02x x%02x\n",myfont.data[8] & 0xff, myfont.data[9] & 0xff, myfont.data[10] & 0xff, myfont.data[11] & 0xff );
+//		printf("FONT[8-11]: x%x (version)\n", myfont.header.version);
+//		printf("FONT[12-15]: x%x %i (header size)\n", myfont.header.header_size, myfont.header.header_size);
+//		printf("FONT[16-19]: x%x (flags)\n", myfont.header.flags);
+//		printf("FONT[20-23]: x%x (glyphs)\n", myfont.header.glyphs);
+//		printf("FONT[24-27]: x%x (char size)\n", myfont.header.char_size);
+//		printf("FONT[28-31]: x%x %i (height)\n", myfont.header.height, myfont.header.height);
+//		printf("FONT[32-35]: x%x %i (width)\n", myfont.header.width, myfont.header.width);
+
+		// validate version and header size
+		if (myfont.header.version != 0) {
+			printf("ERROR: font %s is a v2 PSF which an unknown sub-version (x%x), exiting.\n",
+				filename, myfont.header.version);
+			exit(5);
+		}
+
+		if (myfont.header.header_size != 32) {
+			printf("ERROR: font %s is a v2 PSF which an unknown header size (x%x), exiting.\n",
+				filename, myfont.header.header_size);
+			exit(6);
+		}
+
+		// bytes per row
+		int bytes_per_row = ceil(myfont.header.width / 8);
+		if (myfont.header.char_size != myfont.header.height * bytes_per_row) {
+			printf("ERROR: font %s is a v2 PSF which an internal inconsistancy char_size=%i but we calculated it should be %i, exiting.\n",
+				filename, myfont.header.char_size, bytes_per_row);
+			exit(6);
+		}
+		myfont.bytes_per_row = bytes_per_row;
+
+		myfont.glyphs = myfont.header.glyphs;
+		myfont.height = myfont.header.height;
+		myfont.width = myfont.header.width;
+		myfont.char_size = myfont.header.char_size;
+
+		printf("%s is a v2 PSF with %i %ix%i characters, %i bytes each.\n",
+			filename, myfont.glyphs, myfont.height, myfont.width, myfont.char_size);
+
 		// TODO: implement!!!
+		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
 		exit(4);
 	} else {
 		// wtf?
