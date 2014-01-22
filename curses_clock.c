@@ -135,11 +135,13 @@ int read_font (const char * filename) {
 	) {
 		// v2
 		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
+		printf("FONT[4-7]: x%02x x%02x x%02x x%02x\n",myfont.data[4] & 0xff, myfont.data[5] & 0xff, myfont.data[6] & 0xff, myfont.data[7] & 0xff );
+		printf("FONT[8-11]: x%02x x%02x x%02x x%02x\n",myfont.data[8] & 0xff, myfont.data[9] & 0xff, myfont.data[10] & 0xff, myfont.data[11] & 0xff );
 		// TODO: implement!!!
 		exit(4);
 	} else {
 		// wtf?
-		printf("FONT[0-4]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
+		printf("FONT[0-3]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
 		printf("ERROR: font %s is a not a recognized PSF version, exiting.\n",filename);
 		exit(4);
 	}
