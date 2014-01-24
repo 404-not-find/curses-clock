@@ -28,7 +28,6 @@ TODO
 
 * BUG: handle window resizing
 * BUG: segfaults on Fedora
-* BUG: portability to 32 bit (reading v2 PSF font headers)
 * check for json config in home directory, read it in
 * write out default config on request
 * error handling for unknown timezones

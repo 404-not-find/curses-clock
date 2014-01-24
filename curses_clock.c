@@ -42,14 +42,14 @@ struct Font {
 	union {
 		char data[128*1024]; // the biggest I've seen in the wild is <30k
 		struct Header {
-			unsigned int magic;
-			unsigned int version;
-			unsigned int header_size;
-			unsigned int flags;
-			unsigned int glyphs;
-			unsigned int char_size;
-			unsigned int height;
-			unsigned int width;
+			guint32 magic;
+			guint32 version;
+			guint32 header_size;
+			guint32 flags;
+			guint32 glyphs;
+			guint32 char_size;
+			guint32 height;
+			guint32 width;
 		} header;
 	};
 	unsigned int charmap[512];
@@ -132,7 +132,7 @@ int read_font (const char * filename) {
 		myfont.bytes_per_row = 1;
 		myfont.font_start=4;
 		myfont.height = myfont.char_size = (myfont.data[3] & 0x99);
-		int mode = (myfont.data[2] & 0x99);
+		gint16 mode = (myfont.data[2] & 0x99);
 		if ( mode & 0b001 ) {
 			myfont.glyphs=512;
 		} else {
