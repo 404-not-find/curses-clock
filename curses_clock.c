@@ -184,8 +184,9 @@ int read_font (const char * filename) {
 		myfont.width = myfont.header.width;
 		myfont.char_size = myfont.header.char_size;
 
-		printf("%s is a v2 PSF with %i %ix%i characters, %i bytes each.\n",
-			filename, myfont.glyphs, myfont.height, myfont.width, myfont.char_size);
+		printf("%s is a v2 PSF\n\twith %i %ix%i characters, %i bytes each for %i total bytes of chardata.\n",
+			filename, myfont.glyphs, myfont.height, myfont.width, myfont.char_size,
+			myfont.char_size * myfont.glyphs);
 
 		// TODO: implement!!!
 		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
