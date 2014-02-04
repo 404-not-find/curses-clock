@@ -177,6 +177,12 @@ int read_font (const char * filename) {
 				filename, myfont.header.char_size, bytes_per_row);
 			exit(6);
 		}
+		bytes_per_row++;
+		if (bytes_per_row > 2) {
+			printf("ERROR: font %s is a v2 PSF with bytes_row=%i > 2, exiting.\n",
+				filename, bytes_per_row);
+			exit(7);
+		}
 		myfont.bytes_per_row = bytes_per_row;
 
 		myfont.glyphs = myfont.header.glyphs;
