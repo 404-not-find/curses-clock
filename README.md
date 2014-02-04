@@ -21,7 +21,6 @@ Build Requirements
 
 * ncurses headers and libs (package libncurses5-dev in debian, ncurses-devel in RH)
 * glib-json (package libjson-glib-dev in debian, json-glib-devel in RH)
-* expects 64 bit system
 
 TODO
 ----
