@@ -63,6 +63,21 @@ gchar *timezones[20];
  *        functions
  */
 
+void LogToFile (const gchar *log_domain, GLogLevelFlags log_level,
+    const gchar *message, gpointer user_data)
+{
+	FILE *logfile = fopen ("curses_clock.log", "a");
+	if (logfile == NULL)
+	{
+		/* Fall back to console output if unable to open file */
+		printf ("Rerouted to console: %s\n", message);
+		return;
+	}
+
+	fprintf (logfile, "%s\n", message);
+	fclose (logfile);
+}
+
 int file_exists (char * fileName) {
 	struct stat buf;
 	int i = stat ( fileName, &buf );
@@ -82,6 +97,63 @@ const char *byte_to_binary(int x) {
     }
 
     return b;
+}
+
+guint16 get_segment (unsigned char c, int line) {
+	if (myfont.bytes_per_row == 1) {
+		return myfont.data[ myfont.charmap[c] + line ];
+	} else if (myfont.bytes_per_row == 2) {
+		printf("c='%c' line=%i addr=0x%x\t\t",c,line,myfont.charmap[c]);
+		return (myfont.data[ myfont.charmap[c] + line ] << 8)
+			+ myfont.data[ myfont.charmap[c] + line + 1];
+	} else {
+		printf("ERROR: font has a weird bytes_per_row=%i (not 1 or 2), exiting.\n", myfont.bytes_per_row);
+		exit(8);
+	}
+}
+
+void digits_test () {
+	char *test_chars = "0129:\0";
+
+	unsigned long chars_length = (unsigned long) g_strv_length(&test_chars);
+	for (int y = 0; y <= 4; y++) {
+		printf("segments for '%c' (y=%i/%lu):\n",test_chars[y],y,chars_length);
+
+		for (int line=0; line < myfont.height; line++) {
+			guint16 raw_segment = get_segment(test_chars[y],line);
+
+			static char b[99];
+			b[0] = '\0';
+
+			int segment = 0;
+
+			int z; // loop counter but contains the value for the current bit
+			if (myfont.bytes_per_row == 1) {
+				z = 128;
+			} else if (myfont.bytes_per_row == 2) {
+				z = 32768;
+			}
+
+//			g_debug("got segment %04x for line %i on character %c, z=%i", raw_segment, line, test_chars[y], z);
+			
+			for ( /* above */ ; z > 0; z >>= 1) {
+				if ((raw_segment & z) == z) {
+					int thisy = segment + y * (myfont.width + 1);
+					printf("x");
+//					mvprintw(x,thisy," ",b);
+				} else {
+					printf(" ");
+				}
+				segment++;
+			}
+
+			int thisy = y * (myfont.width + 1);
+			printf("\n");
+//			mvprintw(x,thisy,"%s",b);
+		}
+	}
+
+	printf("END of digits_test()\n");
 }
 
 int read_font (const char * filename) {
@@ -174,10 +246,9 @@ int read_font (const char * filename) {
 		int bytes_per_row = ceil(myfont.header.width / 8);
 		if (myfont.header.char_size != myfont.header.height * bytes_per_row) {
 			printf("ERROR: font %s is a v2 PSF which an internal inconsistancy char_size=%i but we calculated it should be %i, exiting.\n",
-				filename, myfont.header.char_size, bytes_per_row);
+				filename, myfont.header.char_size, myfont.header.height * bytes_per_row);
 			exit(6);
 		}
-		bytes_per_row++;
 		if (bytes_per_row > 2) {
 			printf("ERROR: font %s is a v2 PSF with bytes_row=%i > 2, exiting.\n",
 				filename, bytes_per_row);
@@ -189,14 +260,12 @@ int read_font (const char * filename) {
 		myfont.height = myfont.header.height;
 		myfont.width = myfont.header.width;
 		myfont.char_size = myfont.header.char_size;
+		myfont.font_start = myfont.header.header_size;
 
 		printf("%s is a v2 PSF\n\twith %i %ix%i characters, %i bytes each for %i total bytes of chardata.\n",
 			filename, myfont.glyphs, myfont.height, myfont.width, myfont.char_size,
 			myfont.char_size * myfont.glyphs);
 
-		// TODO: implement!!!
-		printf("ERROR: font %s is a v2 PSF which is UNIMPLEMENTED, exiting.\n",filename);
-		exit(4);
 	} else {
 		// wtf?
 		printf("FONT[0-3]: x%02x x%02x x%02x x%02x\n",myfont.data[0] & 0xff, myfont.data[1] & 0xff, myfont.data[2] & 0xff, myfont.data[3] & 0xff );
@@ -206,8 +275,8 @@ int read_font (const char * filename) {
 
 	unsigned int font_pos = myfont.font_start;
 	for (int c = 0; c < myfont.glyphs; c++) {
-#if 0
 		printf("c=%i <<%c>> starts at %i:\n", c, c, font_pos );
+#if 0
 		for(int l = 0; l < myfont.height; l++) {
 			unsigned char segment = myfont.data[font_pos+l] & 0xff;
 			printf("\tl=%i seg %s\n", l, byte_to_binary(segment) );
@@ -215,6 +284,10 @@ int read_font (const char * filename) {
 #endif
 		myfont.charmap[c] = font_pos;
 		font_pos += myfont.height;
+	}
+
+	if (myfont.header.header_size == 32) {
+		digits_test(); exit(99); // DEBUG
 	}
 
 	// clean up fh
@@ -233,6 +306,9 @@ void initializations() {
 	JsonObject *jsonObj;
 	GError *error;
 	JsonArray *fontpath;
+
+	// log to file
+	g_log_set_handler(NULL, G_LOG_LEVEL_WARNING | G_LOG_LEVEL_DEBUG, LogToFile, NULL);
 
 	// parse JSON
 #if !defined(GLIB_VERSION_2_36) 
@@ -303,12 +379,10 @@ int kbhit () {
 	}
 }
 
-unsigned int get_segment (unsigned char c, int line) {
-	return myfont.data[ myfont.charmap[c] + line ];
-}
-
 int big_display (int x, int y, char *string_small, short color) {
 	int maxi = columns / (myfont.width + 1);
+
+	g_warning("big_display(%i,%i,\"%s\",%i)",x,y,string_small,color);
 
 	// color for clock digits
 	for (int c=0; c < 8; c++) {
@@ -318,13 +392,23 @@ int big_display (int x, int y, char *string_small, short color) {
 
 	for (int line=0; line < myfont.height; line++) {
 		for (int i=0; i < strlen(string_small) && i<maxi; i++) {
-			unsigned int raw_segment = get_segment(string_small[i],line);
-				
+			guint16 raw_segment = get_segment(string_small[i],line);
+
 			static char b[99];
 			b[0] = '\0';
 
 			int segment = 0;
-			for (int z = 128; z > 0; z >>= 1) {
+
+			int z; // loop counter but contains the value for the current bit
+			if (myfont.bytes_per_row == 1) {
+				z = 128;
+			} else if (myfont.bytes_per_row == 2) {
+				z = 32768;
+			}
+
+			g_debug("got segment %04x for line %i on character %c, z=%i", raw_segment, line, string_small[i], z);
+			
+			for ( /* above */ ; z > 0; z >>= 1) {
 				if ((raw_segment & z) == z) {
 					int thisy = segment + y + i * (myfont.width + 1);
 					mvprintw(x,thisy," ",b);
