@@ -1,6 +1,10 @@
 curses-clock
 ============
 
+[![Open Source Love png2](https://badges.frapsoft.com/os/v2/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
+[![GPLv2 license](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://github.com/chicks-net/curses-clock/blob/master/LICENSE)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/chicks-net/curses-clock/graphs/commit-activity)
+
 A clock based on curses in C that uses fixed-sized fonts (PSF) to allow varied displays.
 
 ![screen shot of default config](/docs/clock001.png)
